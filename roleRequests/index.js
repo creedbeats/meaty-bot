@@ -34,9 +34,41 @@ The options are as follows: **${charNames.join(', ')}**`;
 }
 
 const region = ({ msg, req, allRoles }) => {
+  const regionMap = {
+    '544931132282634292': 'Tampa Gear',
+    '545448258718269453': 'North FL Gear',
+    '545029153565704194': 'Central FL Gear',
+    '547636153323356170': 'South FL Gear ',
+    '549597665311064064': 'Panhandle Gear'
+  };
+  const regionRoles = Object.keys(regionMap).map(key => allRoles.find(r => r.id === key));
+  const regionNames = regionRoles.map(r => r.name);
+  const helpMsg = `Requests **MUST** use the following format \`!region Tampa Gear\`
+The options are as follows: **${regionNames.join(', ')}**`;
+  const requestedRoles = req
+    .map(roleName => regionRoles.find(region => normalizeNames(region.name) === normalizeNames(roleName)))
+    .filter(val => !!val);
+  const requestedRoleNames = requestedRoles.map(role => role.name);
+  const newRoles = filterRoles(requestedRoles, msg.member.roles);
+  const newRoleNames = newRoles.map(role => role.name);
 
+  if (newRoles.length) {
+    msg.member.addRoles(newRoles)
+      .then(response => {
+        msg.reply(`You were added to the **${newRoleNames.join(', ')}** region`);
+      })
+      .catch((err) => {
+        console.error(err);
+        msg.reply(`There was an issue with your request. ${helpMsg}`);
+      });
+  } else if (requestedRoles.length) {
+    msg.reply(`You are already in the **${requestedRoleNames.join(', ')}** region`);
+  } else {
+    msg.reply(helpMsg);
+  }
 }
 
 module.exports = {
-  character
+  character,
+  region
 }
