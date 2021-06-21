@@ -20,9 +20,7 @@ class MessageHandler {
   }
   
   roleRequest(msg) {
-    const needsHelp = /^!help/i.test(msg.content);
-
-    const allRoles = msg.guild.roles;
+    const allRoles = msg.guild.roles.cache;
     const re = /^!([^\s]+)\s*(.*)$/ig;
     const match = re.exec(msg.content);
     
